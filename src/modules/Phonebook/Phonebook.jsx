@@ -1,25 +1,28 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import styles from './phonebook.modules.css';
 import ContactList from "./ContactList/ContactList";
 import Filter from "./Filter/Filter";
 import ContactForm from "./ContactForm/ContactForm";
 import { useSelector, useDispatch } from "react-redux";
-import { addContact, deleteContact } from "redux/actions";
+import { addContact, deleteContact } from "redux/contacts/contacts-slice";
+import { setFilter } from "redux/filter/filter-slice";
+import { getAllContacts, getFilteredContacts } from "redux/contacts/contacts-selectors";
+import { getFilter } from "redux/filter/filter-selectors";
 
 const Phonebook = () => {
 
-    const contacts = useSelector(store => store.contacts)
-    const [filter, setFilter] = useState("");
-
+    const filteredContacts = useSelector(getFilteredContacts);
+    const allContacts = useSelector(getAllContacts)
+    const filter = useSelector(getFilter);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        localStorage.setItem("my-contacts", JSON.stringify(contacts))
-    }, [contacts])
+        localStorage.setItem("my-contacts", JSON.stringify(allContacts))
+    }, [allContacts])
 
     const isDublicate = (name) => {
         const normName = name.toLowerCase();
-        const duble = contacts.find(({ name }) => {
+        const duble = allContacts.find(({ name }) => {
             return (name.toLowerCase() === normName)
         })
         return Boolean(duble)
@@ -29,29 +32,16 @@ const Phonebook = () => {
         if (isDublicate(name)) {
             return alert(`${name} is alredy in contacts`);
         }
-        const action = addContact({ name, number })
-        dispatch(action);
+        dispatch(addContact({ name, number }));
     }
 
     const onRemoveContact = (id) => {
-        const action = deleteContact(id);
-        dispatch(action);
+        dispatch(deleteContact(id));
     }
 
-    const handelFilter = ({ target }) => setFilter(target.value);
-
-    const getFilteredContacts = () => {
-        if (!filter) {
-            return contacts
-        }
-        const normFilter = filter.toLowerCase()
-        const result = contacts.filter(({ name, number }) => {
-            return (name.toLowerCase().includes(normFilter) || number.toLowerCase().includes(normFilter))
-        })
-        return result;
-    }
-
-    const filteredContacts = getFilteredContacts();
+    const handelFilter = ({ target }) => {
+        dispatch(setFilter(target.value))
+    };
 
     return (
         <div>
@@ -63,7 +53,7 @@ const Phonebook = () => {
                 </div>
                 <div>
                     <h4>Contacts</h4>
-                    <Filter handelChange={handelFilter} />
+                    <Filter value={filter} handelChange={handelFilter} />
                     <ContactList removeContact={onRemoveContact} contacts={filteredContacts} />
                 </div>
             </div>

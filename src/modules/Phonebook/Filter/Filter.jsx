@@ -1,11 +1,11 @@
 /* eslint-disable react/no-typos */
 import PropTypes from 'prop-types'
 
-const Filter = ({ handelChange }) => {
+const Filter = ({ handelChange, value }) => {
     return (
         <div >
             <h5>Find contacts by name</h5>
-            <input name='filter' onChange={handelChange} />
+            <input value={value} name='filter' onChange={handelChange} />
         </div>
     )
 }

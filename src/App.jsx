@@ -1,12 +1,15 @@
 
 import Phonebook from './modules/Phonebook/Phonebook';
 import { Provider } from 'react-redux';
-import store from 'redux/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from 'redux/store';
 
 export const App = () => {
   return (
     <Provider store={store}>
-      <Phonebook />
+      <PersistGate loading={null} persistor={persistor}>
+        <Phonebook />
+      </PersistGate>
     </Provider>
   );
 };
